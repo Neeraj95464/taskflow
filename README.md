@@ -8,6 +8,11 @@
 
 **A small team task board built the way production services are built: a Spring Boot REST API, a React + TypeScript UI, PostgreSQL with Flyway, real-database integration tests with Testcontainers, Docker images and a GitHub Actions pipeline that builds, tests and smoke-tests the whole stack.**
 
+> **Status — work in progress**
+> - Developed with **AI-assisted development** (Claude Code); design, review and testing by me.
+> - Backend unit/web tests and frontend lint, tests and build pass locally.
+> - **End-to-end testing is pending:** Testcontainers integration tests, Docker image builds and the full `docker compose` stack run are verified only through CI.
+
 ## Architecture
 
 ```mermaid
