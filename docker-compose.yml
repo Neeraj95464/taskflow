@@ -1,0 +1,46 @@
+# Local full stack: PostgreSQL + Spring Boot API + React UI behind nginx.
+# Usage: cp .env.example .env (optional) && docker compose up --build
+name: taskflow
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-taskflow}
+      POSTGRES_USER: ${POSTGRES_USER:-taskflow}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-taskflow}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
+  backend:
+    build: ./backend
+    image: taskflow-backend:local
+    environment:
+      DB_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-taskflow}
+      DB_USERNAME: ${POSTGRES_USER:-taskflow}
+      DB_PASSWORD: ${POSTGRES_PASSWORD:-taskflow}
+    ports:
+      - "${BACKEND_PORT:-8081}:8080"   # Swagger UI + actuator for local inspection
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+  frontend:
+    build: ./frontend
+    image: taskflow-frontend:local
+    ports:
+      - "${FRONTEND_PORT:-8080}:8080"
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  postgres-data:
