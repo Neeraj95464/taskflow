@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
 # ---- Build stage: compile and extract the Spring Boot layers ----
-FROM eclipse-temurin:21-jdk-alpine AS build
+FROM eclipse-temurin:25-jdk-alpine AS build
 WORKDIR /workspace
 
 # Resolve dependencies first so they are cached independently of source changes.
@@ -14,7 +14,7 @@ RUN --mount=type=cache,target=/root/.m2 ./mvnw -B -q package -DskipTests \
     && java -Djarmode=tools -jar target/taskflow.jar extract --layers --destination target/extracted
 
 # ---- Runtime stage: JRE only, non-root, layered for fast rebuilds ----
-FROM eclipse-temurin:21-jre-alpine
+FROM eclipse-temurin:25-jre-alpine
 RUN addgroup -S taskflow && adduser -S taskflow -G taskflow
 WORKDIR /app
 
